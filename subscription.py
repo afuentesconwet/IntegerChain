@@ -1,3 +1,4 @@
+import subprocess
 
 from zmq import *
 import zmq
@@ -22,8 +23,13 @@ from sawtooth_sdk.protobuf.state_context_pb2 import TpEventAddResponse
 from sawtooth_sdk.protobuf.events_pb2 import *
 from sawtooth_sdk.protobuf.client_event_pb2 import *
 
+ip_cmd = subprocess.Popen(["/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'"], stdout=subprocess.PIPE, shell=True)
+(out, err) = ip_cmd.communicate()
+
 #url contains the validator url
-url = "tcp://localhost:4004"
+url = "tcp://"+out.decode("utf-8").rstrip('\n')+":4004"
+
+print("URL:", url)
 
 #Generate Event Subscription
 subscription = EventSubscription(
@@ -31,7 +37,7 @@ subscription = EventSubscription(
 	filters = [
 		EventFilter(
 			key = "addr",
-			match_string = "*",
+			match_string = "",
 			filter_type = EventFilter.REGEX_ANY
 		)
 	]
@@ -70,7 +76,7 @@ msg = Message()
 msg.ParseFromString(resp)
 
 #Validate the response type
-if msg.message_type != CLIENT_EVENTS_SUBSCRIBE_RESPONSE:
+if msg.message_type != Message.CLIENT_EVENTS_SUBSCRIBE_RESPONSE:
 	print("Unexpected Msg Type received")
 
 response = ClientEventsSubscribeResponse()
@@ -91,23 +97,15 @@ while True:
 	msg.ParseFromString(resp)
 	
 	#Validate response type:
-	if msg.message_type != CLIENT_EVENTS:
+	if msg.message_type != Message.CLIENT_EVENTS:
 		print("Unexpected Message Type")
 
 	#Parse the response
-	events = EventList()
-	events.ParseFromString(msg.content)
+	#events = EventList()
+	#events.ParseFromString(msg.content)
 
 	#Print the events in the list
-	for event in events:
-		print(event)
+	#for event in events:
+	#	print(event)
 
-
-
-
-
-
-
-
-
-
+	print("HA LLEGADO TX")
