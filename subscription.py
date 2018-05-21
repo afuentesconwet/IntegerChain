@@ -1,18 +1,26 @@
-from client_event_pb2 import *
-from client_batch_pb2 import *
-from client_batch_submit_pb2 import *
-from client_list_control_pb2 import *
-from client_peers_pb2 import *
-from client_receipt_pb2 import *
-from client_state_pb2 import *
-from client_status_pb2 import *
-from client_transaction_pb2 import *
 
 from zmq import *
 import zmq
-from events_pb2 import *
 
-from sawtooth_sdk import *
+from sawtooth_sdk.processor.context import Context
+from sawtooth_sdk.messaging.future import Future
+from sawtooth_sdk.messaging.future import FutureResult
+
+from sawtooth_sdk.protobuf.validator_pb2 import Message
+
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateEntry
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateGetRequest
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateGetResponse
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateSetRequest
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateSetResponse
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateDeleteRequest
+from sawtooth_sdk.protobuf.state_context_pb2 import TpStateDeleteResponse
+from sawtooth_sdk.protobuf.state_context_pb2 import TpReceiptAddDataRequest
+from sawtooth_sdk.protobuf.state_context_pb2 import TpReceiptAddDataResponse
+from sawtooth_sdk.protobuf.state_context_pb2 import TpEventAddRequest
+from sawtooth_sdk.protobuf.state_context_pb2 import TpEventAddResponse
+from sawtooth_sdk.protobuf.events_pb2 import *
+from sawtooth_sdk.protobuf.client_event_pb2 import *
 
 #url contains the validator url
 url = "tcp://localhost:4004"
@@ -44,8 +52,8 @@ request = ClientEventsSubscribeRequest(
 #Construct the message wrapper
 correlation_id = "123"
 msg = Message(
-	correlation_id=correlation_id,
-	message_type=CLIENT_EVENTS_SUBSCRIBE_REQUEST,
+	correlation_id = correlation_id,
+	message_type = Message.CLIENT_EVENTS_SUBSCRIBE_REQUEST,
 	content = request
 )
 
